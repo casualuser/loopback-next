@@ -95,7 +95,9 @@ export class RequestContext extends Context implements HandlerContext {
     super(parent, name);
     this._setupBindings(request, response);
     onFinished(this.response, () => {
-      this.close();
+      // See https://github.com/strongloop/loopback-next/issues/2541
+      // We call `clearSubscriptions` instead of `close`
+      this.clearSubscriptions();
     });
   }
 

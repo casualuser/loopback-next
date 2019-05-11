@@ -390,7 +390,7 @@ export function invokeMethodWithInterceptors(
       const interceptors = invocationCtx.loadInterceptors();
       return invokeInterceptors(invocationCtx, interceptors);
     },
-    () => invocationCtx.close(),
+    () => invocationCtx.clearSubscriptions(),
   );
 }
 

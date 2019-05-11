@@ -403,15 +403,15 @@ export class Context extends EventEmitter {
   }
 
   /**
-   * Close the context and release references to other objects in the context
-   * chain.
+   * Remove observers, stop notifications, and remove event listeners from its
+   * parent context.
    *
+   * @remarks
    * This method MUST be called to avoid memory leaks once a context object is
    * no longer needed and should be recycled. An example is the `RequestContext`,
    * which is created per request.
    */
-  close() {
-    this._debug('Closing context...');
+  clearSubscriptions() {
     this.observers = undefined;
     if (this.notificationQueue != null) {
       // Cancel the notification iterator
@@ -426,6 +426,16 @@ export class Context extends EventEmitter {
       }
       this._parentEventListeners = undefined;
     }
+  }
+
+  /**
+   * Close the context and release references to other objects in the context
+   * chain. It calls `clearSubscriptions()`, clears the registry, and set
+   * parent context to `undefined`.
+   */
+  close() {
+    this._debug('Closing context...');
+    this.clearSubscriptions();
     this.registry.clear();
     this._parent = undefined;
   }
