@@ -408,7 +408,7 @@ Verify how was the stubbed method executed at the end of your unit test (in the
 ```ts
 // expect that repository.find() was called with the first
 // argument deeply-equal to the provided object
-sinon.assert.calledWithMatch({where: {id: 1}});
+sinon.assert.calledWithMatch(findStub, {where: {id: 1}});
 ```
 
 See [Unit test your controllers](#unit-test-your-controllers) for a full
@@ -416,9 +416,56 @@ example.
 
 #### Create a stub Service
 
-{% include content/tbd.html %}
+If your controller relies on service proxy for service oriented backends such as
+REST APIs, SOAP Web Services, or gRPC microservices, then we can create stubs
+for the service akin to the steps outlined in the above
+[stub repository](#create-a-stub-repository) section. Consider a dependency on a
+`GeoCoder` service that relies on a remote REST API for returning coordinates
+for a specific address.
 
-The initial beta release does not include Services as a first-class feature.
+```ts
+class DummyGeocoder implements GeocoderService {
+  // in practice, the constructor could take an API key to authenticate with
+  // the service proxy provider
+  constructor() {}
+
+  geocode(address: string) {
+    // this would call the remote API for the real coordinates
+  }
+}
+```
+
+Create a test double for the service class:
+
+```ts
+describe('GeoCoderController', () => {
+  let geoService: DummyGeocoder;
+  beforeEach(givenStubbedService);
+
+  // your unit tests
+
+  function givenStubbedService() {
+    geoService = sinon.createStubInstance(DummyGeocoder);
+  }
+});
+```
+
+Configure the `geocode` method as a stub and its behaviour before your test(s):
+
+```ts
+// geoService.geocode() will return a promise that
+// will be resolved with the provided array
+const geocodeStub = geoService.geocode as sinon.SinonStub;
+geocodeStub.resolves([{y: 0, x: 0}]);
+```
+
+Verify how the stub was executed:
+
+```ts
+// expect that geoService.geocode() was called with the first
+// argument equal to the provided address string
+sinon.assert.calledWithMatch(geocodeStub, '1600 Pennsylvania Ave NW');
+```
 
 ### Unit test your Controllers
 
