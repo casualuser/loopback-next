@@ -456,7 +456,7 @@ Configure the `geocode` method as a stub and its behaviour before your test(s):
 // geoService.geocode() will return a promise that
 // will be resolved with the provided array
 const geocodeStub = geoService.geocode as sinon.SinonStub;
-geocodeStub.resolves([{y: 0, x: 0}]);
+geocodeStub.resolves([<GeoPoint>{y: 41.109653, x: -73.72467}]);
 ```
 
 Verify how the stub was executed:
@@ -464,8 +464,12 @@ Verify how the stub was executed:
 ```ts
 // expect that geoService.geocode() was called with the first
 // argument equal to the provided address string
-sinon.assert.calledWithMatch(geocodeStub, '1600 Pennsylvania Ave NW');
+sinon.assert.calledWithMatch(geocodeStub, '1 New Orchard Road, Armonk, 10504');
 ```
+
+Check out
+[this](<(https://github.com/strongloop/loopback-next/blob/master/examples/todo/src/__tests__/unit/controllers/todo.controller.unit.ts#L53-L71)>)
+test illustrating the above points in action.
 
 ### Unit test your Controllers
 
